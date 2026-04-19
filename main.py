@@ -33,8 +33,20 @@ def generate_insights(code):
 
 if __name__ == "__main__":
     import sys
+    if len(sys.argv) < 2:
+        print("Usage: python main.py <directory>")
+        sys.exit(1)
+
     directory = sys.argv[1]
+    if not os.path.isdir(directory):
+        print(f"Error: {directory} is not a valid directory.")
+        sys.exit(1)
+
     code = read_python_files(directory)
+    if not code.strip():
+        print("No Python files found in the directory.")
+        sys.exit(0)
+
     summary = summarize_code(code)
 
     print("Code Summary:")

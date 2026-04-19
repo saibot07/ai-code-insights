@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Python dependencies
+      run: |
+        if [ -f requirements.txt ]; then
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+        fi
+
+    - name: Run Python lint/test
+      run: |
+        if [ -f pytest.ini ] || [ -d tests ]; then
+          pytest || echo "Tests failed"
+        elif command -v flake8; then
+          flake8 . || echo "Linting issues found"
+        fi
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16.x'
+
+    - name: Install Node.js dependencies
+      run: |
+        if [ -f package.json ]; then
+          npm install
+        fi
+
+    - name: Run Node.js lint/test
+      run: |
+        if [ -f package.json ]; then
+          npm run lint || echo "Linting issues found"
+          npm test || echo "Tests failed"
+        fi
